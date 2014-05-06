@@ -5,6 +5,7 @@
   <script src='js/libs/jquery.js'></script>
   <script src='js/libs/handlebars.js'></script>
   <script src='js/libs/ember.js'></script>
+  <script src="http://builds.emberjs.com/canary/ember-data.js"></script>
   <script src='js/app.js'></script>
 </head>
 <body>
@@ -64,6 +65,12 @@
       <div class='col-sm-7'>
         <h2>{{name}}</h2>
         <h3 class='text-success'>{{about}}</h3>
+        <p>{{name}} is responsible for:</p>
+        <ul>
+          {{#each products}}
+          <li>{{#link-to 'product' this}}{{title}}{{/link-to}}</li>
+          {{/each}}
+        </ul>
         <img {{bind-attr src='avatar' alt='name'}} class='img-thumbnail col-sm-5' />
       </div>
       <div class='col-sm-5'>
@@ -110,6 +117,15 @@
         <h2>{{title}}</h2>
         <h3 class='text-success'>${{price}}</h3>
         <p class='text-muted'>{{description}}</p>
+        <h5>Crafted by: {{#link-to 'contact' crafter}}{{crafter.name}}{{/link-to}}</h5>
+        <h3>Reviews</h3>
+        <ul>
+          {{#each reviews}}
+          <li>{{text}}</li>
+          {{else}}
+          <li><em>No reviews yet. Be the first to review this product!</em></li>
+          {{/each}}
+        </ul>
       </div>
       <div class='col-sm-5'>
         <img {{bind-attr src='image'}} class='img-thumbnail img-rounded'/>
