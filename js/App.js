@@ -1,4 +1,4 @@
-var App = Ember.Application.create({
+var App = Em.Application.create({
   LOG_TRANSITIONS: true
 });
 App.ApplicationAdapter = DS.FixtureAdapter.extend();
@@ -7,58 +7,102 @@ App.Router.map(function() {
   this.route('credits', { path: '/donkey-kong' });
   this.resource('products', function() {
     this.resource('product', { path: '/:product_id' });
+    this.route('onsale');
+    this.route('deals');
   });
   this.resource('contacts', function() {
     this.resource('contact', { path: '/:contact_id' });
   });
 });
 
-App.IndexController = Ember.ArrayController.extend({
-  productsCount: Ember.computed.alias('length'),
-  logo: 'images/logo-small.png',
+App.ApplicationController = Em.Controller.extend({
   time: function() {
     return (new Date()).toDateString();
   }.property()
 });
-
-App.ProductsController = Ember.ArrayController.extend({
-  sortProperties: ['title']
+App.IndexController = Em.ArrayController.extend({
+  productsCount: Em.computed.alias('length'),
+  logo: 'images/logo-small.png',
+  time: function() {
+    return (new Date()).toDateString();
+  }.property(),
+  onSale: function() {
+    return this.filterBy('isOnSale').slice(0, 3);
+  }.property('@each.isOnSale')
 });
-
-App.ContactsIndexController = Ember.Controller.extend({
-  contactName: 'Anostagia',
+App.ProductsIndexController = Em.ArrayController.extend({
+  deals: function() {
+    return this.filter(function(product) {
+      return product.get('price') < 500;
+    });
+  }.property('@each.price')
+});
+App.ContactsIndexController = Em.ObjectController.extend({
+  contactName: Em.computed.alias('name'),
   avatar: 'images/avatar.png',
   open: function() {
     return ((new Date()).getDay() === 0) ? "Closed" : "Open";
   }.property()
 });
+App.ProductsController = Em.ArrayController.extend({
+  sortProperties: ['title']
+});
 
-App.ProductsRoute = Ember.Route.extend({
+App.ProductDetailsComponent = Em.Component.extend({
+  reviewsCount: Em.computed.alias('product.reviews.length'),
+  hasReviews: function(){
+    return this.get('reviewsCount') > 0;
+  }.property('reviewsCount')
+});
+App.ContactDetailsComponent = Em.Component.extend({
+  productsCount: Em.computed.alias('contact.products.length'),
+  isProductive: function() {
+    return this.get('productsCount') > 3;
+  }.property('productsCount')
+});
+
+App.ProductsRoute = Em.Route.extend({
   model: function() {
     return this.store.findAll('product');
   }
 });
-App.ProductRoute = Ember.Route.extend({
-  model: function(params) {
-    return this.store.find('product', params.product_id);
-  }
-});
-App.ContactsRoute = Ember.Route.extend({
+App.ProductsIndexRoute =Em.Route.extend({
   model: function() {
-    return this.store.find('contact');
+    return this.store.findAll('product');
   }
 });
-App.ContactRoute = Ember.Route.extend({
-  model: function(params) {
-    return this.store.find('contact', params.contact_id);
-  }
-});
-App.CreditsRoute = Ember.Route.extend({
+App.ProductsOnsaleRoute = Em.Route.extend({
   model: function() {
-    return this.store.find('credit');
+    return this.modelFor('products').filterBy('isOnSale');
   }
 });
-
+App.ProductsDealsRoute = Em.Route.extend({
+  model: function(){
+    return this.modelFor('products').filter(function(product) {
+      return product.get('price') < 500;
+    });
+  }
+});
+App.ContactsRoute = Em.Route.extend({
+  model: function() {
+    return this.store.findAll('contact');
+  }
+});
+App.IndexRoute = Em.Route.extend({
+  model: function() {
+    return this.store.findAll('product');
+  }
+});
+App.ContactsIndexRoute = Em.Route.extend({
+  model: function() {
+    return this.store.find('contact', 200)
+  }
+});
+App.CreditsRoute = Em.Route.extend({
+  model: function() {
+    return this.store.findAll('credit');
+  }
+});
 
 App.Product = DS.Model.extend({
   title: DS.attr('string'),
@@ -69,19 +113,16 @@ App.Product = DS.Model.extend({
   reviews: DS.hasMany('review', {async: true}),
   crafter: DS.belongsTo('contact')
 });
-
 App.Contact = DS.Model.extend({
   name: DS.attr('string'),
   about: DS.attr('string'),
   avatar: DS.attr('string'),
   products: DS.hasMany('product', {async: true})
 });
-
 App.Credit = DS.Model.extend({
   name: DS.attr('string'),
   number: DS.attr('number')
 });
-
 App.Review = DS.Model.extend({
   text: DS.attr('string'),
   reviewedAt: DS.attr('date'),
@@ -151,7 +192,6 @@ App.Product.FIXTURES = [
     crafter: 200
   }
 ];
-
 App.Contact.FIXTURES = [
   {
     id: 100,
@@ -168,7 +208,6 @@ App.Contact.FIXTURES = [
     products: [2, 3, 5, 6]
   }
 ];
-
 App.Credit.FIXTURES = [
   {
     id: 1,
@@ -181,7 +220,6 @@ App.Credit.FIXTURES = [
     number: 2000
   }
 ];
-
 App.Review.FIXTURES = [
   {
     id: 100,

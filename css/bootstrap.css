@@ -3938,16 +3938,17 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   }
 }
 .navbar-default {
-  background-color: #f8f8f8;
+  background-color: #826258;
   border-color: #e7e7e7;
 }
 .navbar-default .navbar-brand {
-  color: #777;
+  color: #fff;
 }
 .navbar-default .navbar-brand:hover,
 .navbar-default .navbar-brand:focus {
-  color: #5e5e5e;
-  background-color: transparent;
+  color: #fff;
+  font-weight: bold;
+  background-color: #b65a31;
 }
 .navbar-default .navbar-text {
   color: #777;
@@ -4368,7 +4369,7 @@ a.list-group-item.active > .badge,
   padding: 30px;
   margin-bottom: 30px;
   color: inherit;
-  background-color: #eee;
+  background-color: #f0eee1;
 }
 .jumbotron h1,
 .jumbotron .h1 {
@@ -5783,3 +5784,7 @@ button.close {
   }
 }
 /*# sourceMappingURL=bootstrap.css.map */
+
+.margined {
+  margin-left: 10px;
+}

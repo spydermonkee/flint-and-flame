@@ -26,6 +26,7 @@
     <footer class='container'>
       <hr />
       <p class='pull-left'>&copy; 2013 The Flint &amp; Flame</p>
+      <p class='pull-right text-muted margined'>Rendered on {{time}}</p>
       <p class='pull-right'>{{#link-to 'credits'}}Credits{{/link-to}}</p>
     </footer>
   </script>
@@ -40,9 +41,26 @@
         {{#link-to 'products' class='btn btn-primary btn-lg'}}
           Browse All {{productsCount}} Items &raquo;
         {{/link-to}}
+        {{#link-to 'products.deals' class='btn btn-danger btn-lg'}}
+          Browse Deals
+        {{/link-to}}
+        {{#link-to 'products.onsale' class='btn btn-warning btn-lg'}}
+          Browse Sale Items
+        {{/link-to}}
       </p>
     </div>
-    <p class='pull-right text-muted'>Rendered on {{time}}</p>
+    {{#each onSale}}
+      <div class="col-sm-4">
+        <img {{bind-attr src='image'}} class="img-thumbnail col-sm-5" />
+        <div class="col-sm-7">
+          <h2>{{title}}</h2>
+            {{#link-to 'products.onsale' class='btn btn-warning'}}On Sale{{/link-to}}
+          <p class="product-description">{{description}}</p>
+          <p>{{#link-to 'product' this class='btn btn-success'}}
+              Buy for ${{price}}{{/link-to}}</p>
+        </div>
+      </div>
+    {{/each}}
   </script>
   <script type='text/x-handlebars' data-template-name='contacts'>
     <div class='row'>
@@ -88,6 +106,18 @@
       </div>
     </div>
   </script>
+  <script type='text/x-handlebars' data-template-name='components/contact-details'>
+    <div class='col-sm-9'>
+      <h2>About {{contact.name}}</h2>
+      <p>{{contact.about}}</p>
+    </div>
+    <div class='col-sm-3'>
+      <img {{bind-attr src='contact.avatar' alt='contact.name'}} class='img-thumbnail img-rounded'/>
+    </div>
+    {{#if isProductive}}
+      <p class="text-muted">{{contact.name}} has crafted {{productsCount}} products. </p>
+    {{/if}}
+  </script>
   <script type='text/x-handlebars' data-template-name='credits'>
     <h1>Thanks for the Help!</h1>
     <p>This site would not be possible without the hardworking Ember Core Team!</p>
@@ -131,9 +161,48 @@
         <img {{bind-attr src='image'}} class='img-thumbnail img-rounded'/>
       </div>
     </div>
+    {{contact-details contact=crafter tag='div' class='row'}}
+  </script>
+  <script type='text/x-handlebars' data-template-name='products/onsale'>
+    <ul class='list-unstyled'>
+      {{#each}}
+        <li class='row'>
+          <img {{bind-attr src='image'}} class='img-thumbnail col-sm-5' />
+          <div class='col-sm-7'>
+            <h2>{{title}}</h2>
+            <p class="product-description">{{description}}</p>
+            <p>{{#link-to 'product' this class='btn btn-success'}}
+                Buy for ${{price}}{{/link-to}}</p>
+          </div>
+        </li>
+      {{/each}}
+    </ul>
   </script>
   <script type='text/x-handlebars' data-template-name='products/index'>
     <p class='text-muted'>Choose a product from those on the left!</p>
+    {{#each deals}}
+      {{product-details product=this tagName='div' classNames='col-sm-4'}}
+    {{/each}}
+  </script>
+  <script type='text/x-handlebars' data-template-name="products/deals">
+    <h1>Our Best Deals:</h1>
+    <ul class='list-unstyled'>
+      {{#each}}
+        {{product-details product=this tagName='li' classNames="row"}}
+      {{/each}}
+    </ul>
+  </script>
+  <script type='text/x-handlebars' data-template-name="components/product-details">
+    <img {{bind-attr src='product.image'}} class='img-thumbnail col-sm-5' />
+    <div class="col-sm-7">
+      <h2>{{product.title}}</h2>
+      <p class="product-description">{{product.description}}</p>
+      <p>{{#link-to 'product' product class='btn btn-success'}}
+        Buy for ${{product.price}}{{/link-to}}</p>
+      {{# if hasReviews}}
+      <p class="text-muted">Read the {{#link-to 'product' product}}reviews{{/link-to}}({{reviewsCount}})
+      {{/if}}
+    </div>
   </script>
 </body>
 </html>
